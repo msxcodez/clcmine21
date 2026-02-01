@@ -76,7 +76,7 @@
 
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-bottom: 30px;
         }
@@ -414,17 +414,6 @@
             h2 {
                 font-size: 1rem;
             }
-
-            .calc-btn {
-                padding: 15px;
-                font-size: 1rem;
-            }
-        }
-
-        @media (min-width: 969px) and (max-width: 1400px) {
-            .main-grid {
-                grid-template-columns: 1fr 1fr;
-            }
         }
 
         /* Particle effect */
@@ -454,106 +443,45 @@
             100% { opacity: 0; transform: translateY(-100px) rotate(360deg); }
         }
 
-        /* Calculator styles */
-        .calculator {
-            background: rgba(0,0,0,0.4);
-            padding: 20px;
-            border: 3px solid var(--stone-gray);
-            margin-bottom: 20px;
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
         }
 
-        .calc-display {
-            background: rgba(0,0,0,0.7);
-            border: 3px solid var(--diamond-cyan);
-            padding: 15px;
-            margin-bottom: 15px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 1.5rem;
+        .theme-button {
+            padding: 12px 20px;
+            background: var(--redstone-red);
             color: var(--gold-yellow);
-            text-align: right;
-            min-height: 60px;
-            word-wrap: break-word;
-            box-shadow: inset 0 0 20px rgba(0, 206, 209, 0.3);
-        }
-
-        .calc-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-
-        .calc-btn {
-            padding: 20px;
+            border: 4px solid #8B0000;
             font-family: 'Press Start 2P', cursive;
-            font-size: 1.2rem;
-            background: linear-gradient(180deg, var(--stone-gray), #555);
-            border: 4px solid #3a3a3a;
-            color: #FFF;
             cursor: pointer;
-            box-shadow: 0 4px 0 #3a3a3a;
-            transition: all 0.1s;
-            text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-        }
-
-        .calc-btn:hover {
-            background: linear-gradient(180deg, #999, var(--stone-gray));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #3a3a3a;
-        }
-
-        .calc-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #3a3a3a;
-        }
-
-        .calc-btn.operator {
-            background: linear-gradient(180deg, #FF8C00, #FF6B00);
-            border-color: #CC5500;
-            box-shadow: 0 4px 0 #CC5500;
-        }
-
-        .calc-btn.operator:hover {
-            background: linear-gradient(180deg, #FFA500, #FF8C00);
-            box-shadow: 0 6px 0 #CC5500;
-        }
-
-        .calc-btn.operator:active {
-            box-shadow: 0 2px 0 #CC5500;
-        }
-
-        .calc-btn.equals {
-            background: linear-gradient(180deg, var(--grass-green), #2E7D32);
-            border-color: #1B5E20;
-            box-shadow: 0 4px 0 #1B5E20;
-            grid-column: span 2;
-        }
-
-        .calc-btn.equals:hover {
-            background: linear-gradient(180deg, #66BB6A, var(--grass-green));
-            box-shadow: 0 6px 0 #1B5E20;
-        }
-
-        .calc-btn.equals:active {
-            box-shadow: 0 2px 0 #1B5E20;
-        }
-
-        .calc-btn.clear {
-            background: linear-gradient(180deg, var(--redstone-red), #B22222);
-            border-color: #8B0000;
+            font-size: 0.7rem;
+            text-transform: uppercase;
             box-shadow: 0 4px 0 #8B0000;
+            transition: all 0.1s;
         }
 
-        .calc-btn.clear:hover {
-            background: linear-gradient(180deg, #FF4444, var(--redstone-red));
+        .theme-button:hover {
+            background: #FF0000;
+            transform: translateY(-2px);
             box-shadow: 0 6px 0 #8B0000;
         }
 
-        .calc-btn.clear:active {
+        .theme-button:active {
+            transform: translateY(2px);
             box-shadow: 0 2px 0 #8B0000;
         }
     </style>
 </head>
 <body>
+    <div class="theme-switcher">
+        <button class="theme-button" onclick="window.location.href='soviet-currency-calculator.html'">
+            ☭ Советский стиль
+        </button>
+    </div>
+
     <div class="particles" id="particles"></div>
     
     <div class="container">
@@ -610,45 +538,6 @@
                 <div class="info-box">
                     <strong>ℹ️ Курс обновляется каждые 30 секунд</strong><br>
                     Небольшие колебания курса шагов (±5%) делают экономику более реалистичной!
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>🔢 Калькулятор</h2>
-                
-                <div class="calculator">
-                    <div class="calc-display" id="calcDisplay">0</div>
-                    
-                    <div class="calc-buttons">
-                        <button class="calc-btn clear" onclick="calcClear()">C</button>
-                        <button class="calc-btn operator" onclick="calcBackspace()">←</button>
-                        <button class="calc-btn operator" onclick="calcOperation('%')">%</button>
-                        <button class="calc-btn operator" onclick="calcOperation('/')">÷</button>
-                        
-                        <button class="calc-btn" onclick="calcNumber('7')">7</button>
-                        <button class="calc-btn" onclick="calcNumber('8')">8</button>
-                        <button class="calc-btn" onclick="calcNumber('9')">9</button>
-                        <button class="calc-btn operator" onclick="calcOperation('*')">×</button>
-                        
-                        <button class="calc-btn" onclick="calcNumber('4')">4</button>
-                        <button class="calc-btn" onclick="calcNumber('5')">5</button>
-                        <button class="calc-btn" onclick="calcNumber('6')">6</button>
-                        <button class="calc-btn operator" onclick="calcOperation('-')">-</button>
-                        
-                        <button class="calc-btn" onclick="calcNumber('1')">1</button>
-                        <button class="calc-btn" onclick="calcNumber('2')">2</button>
-                        <button class="calc-btn" onclick="calcNumber('3')">3</button>
-                        <button class="calc-btn operator" onclick="calcOperation('+')">+</button>
-                        
-                        <button class="calc-btn" onclick="calcNumber('0')">0</button>
-                        <button class="calc-btn" onclick="calcNumber('.')">.</button>
-                        <button class="calc-btn equals" onclick="calcEquals()">=</button>
-                    </div>
-                </div>
-
-                <div class="info-box">
-                    <strong>📊 Математический калькулятор</strong><br>
-                    Поддерживает сложение, вычитание, умножение, деление и проценты!
                 </div>
             </div>
 
@@ -773,116 +662,6 @@
         // Update fluctuation every 30 seconds
         updateFluctuation();
         setInterval(updateFluctuation, 30000);
-
-        // Calculator Logic
-        let calcCurrentValue = '0';
-        let calcPreviousValue = '';
-        let calcOperation = '';
-        let calcShouldResetDisplay = false;
-
-        const calcDisplay = document.getElementById('calcDisplay');
-
-        function updateCalcDisplay() {
-            calcDisplay.textContent = calcCurrentValue;
-        }
-
-        function calcNumber(num) {
-            if (calcShouldResetDisplay) {
-                calcCurrentValue = num;
-                calcShouldResetDisplay = false;
-            } else {
-                if (calcCurrentValue === '0' && num !== '.') {
-                    calcCurrentValue = num;
-                } else if (num === '.' && calcCurrentValue.includes('.')) {
-                    return;
-                } else {
-                    calcCurrentValue += num;
-                }
-            }
-            updateCalcDisplay();
-        }
-
-        function calcOperation(op) {
-            if (calcPreviousValue && calcOperation && !calcShouldResetDisplay) {
-                calcEquals();
-            }
-            calcPreviousValue = calcCurrentValue;
-            calcOperation = op;
-            calcShouldResetDisplay = true;
-        }
-
-        function calcEquals() {
-            if (!calcPreviousValue || !calcOperation) return;
-            
-            const prev = parseFloat(calcPreviousValue);
-            const current = parseFloat(calcCurrentValue);
-            let result;
-
-            switch (calcOperation) {
-                case '+':
-                    result = prev + current;
-                    break;
-                case '-':
-                    result = prev - current;
-                    break;
-                case '*':
-                    result = prev * current;
-                    break;
-                case '/':
-                    result = current !== 0 ? prev / current : 'Error';
-                    break;
-                case '%':
-                    result = prev % current;
-                    break;
-                default:
-                    return;
-            }
-
-            if (result === 'Error') {
-                calcCurrentValue = 'Error';
-            } else {
-                calcCurrentValue = result.toString();
-                if (calcCurrentValue.length > 12) {
-                    calcCurrentValue = parseFloat(calcCurrentValue).toExponential(6);
-                }
-            }
-            
-            calcOperation = '';
-            calcPreviousValue = '';
-            calcShouldResetDisplay = true;
-            updateCalcDisplay();
-        }
-
-        function calcClear() {
-            calcCurrentValue = '0';
-            calcPreviousValue = '';
-            calcOperation = '';
-            calcShouldResetDisplay = false;
-            updateCalcDisplay();
-        }
-
-        function calcBackspace() {
-            if (calcCurrentValue.length > 1) {
-                calcCurrentValue = calcCurrentValue.slice(0, -1);
-            } else {
-                calcCurrentValue = '0';
-            }
-            updateCalcDisplay();
-        }
-
-        // Keyboard support for calculator
-        document.addEventListener('keydown', (e) => {
-            if (e.key >= '0' && e.key <= '9') calcNumber(e.key);
-            if (e.key === '.') calcNumber('.');
-            if (e.key === '+') calcOperation('+');
-            if (e.key === '-') calcOperation('-');
-            if (e.key === '*') calcOperation('*');
-            if (e.key === '/') { e.preventDefault(); calcOperation('/'); }
-            if (e.key === '%') calcOperation('%');
-            if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); calcEquals(); }
-            if (e.key === 'Escape') calcClear();
-            if (e.key === 'Backspace') { e.preventDefault(); calcBackspace(); }
-        });
 
         // Music Player Logic
         const audioPlayer = document.getElementById('audioPlayer');
