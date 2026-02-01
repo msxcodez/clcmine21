@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виртуальные валюты Minecraft | Калькулятор</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dirt-brown: #8B6914;
+            --grass-green: #4CAF50;
+            --stone-gray: #7F7F7F;
+            --diamond-cyan: #00CED1;
+            --emerald-green: #50C878;
+            --gold-yellow: #FFD700;
+            --dark-oak: #4A3728;
+            --redstone-red: #DC143C;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background: linear-gradient(180deg, #87CEEB 0%, #4A90A4 50%, #2C5F2D 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Pixel art clouds */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 10%;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: 
+                radial-gradient(ellipse 120px 40px at 20% 30%, rgba(255,255,255,0.8) 0%, transparent 100%),
+                radial-gradient(ellipse 100px 35px at 60% 50%, rgba(255,255,255,0.7) 0%, transparent 100%),
+                radial-gradient(ellipse 130px 45px at 85% 40%, rgba(255,255,255,0.75) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            color: #FFD700;
+            text-shadow: 
+                4px 4px 0 #000,
+                -2px -2px 0 #000,
+                2px -2px 0 #000,
+                -2px 2px 0 #000;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, rgba(139, 105, 20, 0.95), rgba(74, 55, 40, 0.95));
+            border: 6px solid var(--dark-oak);
+            box-shadow: 
+                0 8px 0 rgba(0,0,0,0.4),
+                0 12px 20px rgba(0,0,0,0.3),
+                inset 0 2px 0 rgba(255,255,255,0.1);
+            padding: 30px;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--gold-yellow) 0%, 
+                var(--diamond-cyan) 50%, 
+                var(--emerald-green) 100%);
+        }
+
+        h2 {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--gold-yellow);
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+        }
+
+        .currency-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border: 3px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .currency-row:hover {
+            background: rgba(0,0,0,0.4);
+            border-color: var(--gold-yellow);
+            transform: translateX(5px);
+        }
+
+        .currency-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5));
+        }
+
+        label {
+            font-size: 1.3rem;
+            color: #FFF;
+            min-width: 120px;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.7);
+        }
+
+        input[type="number"] {
+            flex: 1;
+            padding: 12px 15px;
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            background: rgba(0,0,0,0.5);
+            border: 3px solid var(--stone-gray);
+            color: #FFF;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--diamond-cyan);
+            box-shadow: 0 0 15px rgba(0, 206, 209, 0.5);
+            background: rgba(0,0,0,0.6);
+        }
+
+        .exchange-rates {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border: 3px solid var(--emerald-green);
+            margin-bottom: 20px;
+        }
+
+        .rate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            font-size: 1.2rem;
+            color: #FFF;
+            border-bottom: 2px dashed rgba(255,255,255,0.2);
+            margin-bottom: 10px;
+        }
+
+        .rate-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .rate-value {
+            color: var(--gold-yellow);
+            font-weight: bold;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Music Player */
+        .music-player {
+            background: linear-gradient(145deg, rgba(220, 20, 60, 0.95), rgba(139, 0, 0, 0.95));
+            border: 6px solid #8B0000;
+            padding: 30px;
+            box-shadow: 
+                0 8px 0 rgba(0,0,0,0.4),
+                0 12px 20px rgba(0,0,0,0.3);
+        }
+
+        .music-player::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--redstone-red), var(--gold-yellow));
+        }
+
+        .music-player h2 {
+            color: #FFD700;
+        }
+
+        .playlist {
+            margin-bottom: 20px;
+        }
+
+        .track {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 3px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .track:hover {
+            background: rgba(0,0,0,0.6);
+            border-color: var(--gold-yellow);
+            transform: translateX(5px);
+        }
+
+        .track.active {
+            border-color: var(--redstone-red);
+            background: rgba(220, 20, 60, 0.3);
+        }
+
+        .track.user-track {
+            border-color: var(--gold-yellow);
+        }
+
+        .track-icon {
+            font-size: 24px;
+        }
+
+        .track-name {
+            flex: 1;
+            font-size: 1.3rem;
+            color: #FFF;
+        }
+
+        .remove-track {
+            padding: 5px 10px;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            background: var(--redstone-red);
+            border: 2px solid #8B0000;
+            color: #FFF;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .remove-track:hover {
+            background: #FF0000;
+            transform: scale(1.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 25px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            background: linear-gradient(180deg, var(--grass-green), #2E7D32);
+            border: 4px solid #1B5E20;
+            color: #FFF;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1B5E20;
+            transition: all 0.1s;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+        }
+
+        button:hover {
+            background: linear-gradient(180deg, #66BB6A, var(--grass-green));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #1B5E20;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #1B5E20;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border: 3px solid rgba(255,255,255,0.1);
+        }
+
+        .volume-label {
+            font-size: 1.2rem;
+            color: #FFF;
+            min-width: 100px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            background: rgba(0,0,0,0.5);
+            outline: none;
+            border: 2px solid var(--stone-gray);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--redstone-red);
+            border: 3px solid #FFF;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--redstone-red);
+            border: 3px solid #FFF;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .volume-value {
+            font-size: 1.5rem;
+            color: var(--gold-yellow);
+            min-width: 50px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .status {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border: 3px solid rgba(255,255,255,0.1);
+            margin-top: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #FFF;
+        }
+
+        .status.playing {
+            border-color: var(--redstone-red);
+            animation: statusGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes statusGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(220, 20, 60, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(220, 20, 60, 0.8); }
+        }
+
+        .info-box {
+            background: rgba(0, 206, 209, 0.2);
+            border: 3px solid var(--diamond-cyan);
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #FFF;
+            line-height: 1.8;
+        }
+
+        .info-box strong {
+            color: var(--gold-yellow);
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1rem;
+            }
+
+            .calc-btn {
+                padding: 15px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 969px) and (max-width: 1400px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Particle effect */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--gold-yellow);
+            opacity: 0;
+            animation: sparkle 4s linear infinite;
+        }
+
+        @keyframes sparkle {
+            0% { opacity: 0; transform: translateY(100vh) rotate(0deg); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-100px) rotate(360deg); }
+        }
+
+        /* Calculator styles */
+        .calculator {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border: 3px solid var(--stone-gray);
+            margin-bottom: 20px;
+        }
+
+        .calc-display {
+            background: rgba(0,0,0,0.7);
+            border: 3px solid var(--diamond-cyan);
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: var(--gold-yellow);
+            text-align: right;
+            min-height: 60px;
+            word-wrap: break-word;
+            box-shadow: inset 0 0 20px rgba(0, 206, 209, 0.3);
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            padding: 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            background: linear-gradient(180deg, var(--stone-gray), #555);
+            border: 4px solid #3a3a3a;
+            color: #FFF;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #3a3a3a;
+            transition: all 0.1s;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+        }
+
+        .calc-btn:hover {
+            background: linear-gradient(180deg, #999, var(--stone-gray));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #3a3a3a;
+        }
+
+        .calc-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #3a3a3a;
+        }
+
+        .calc-btn.operator {
+            background: linear-gradient(180deg, #FF8C00, #FF6B00);
+            border-color: #CC5500;
+            box-shadow: 0 4px 0 #CC5500;
+        }
+
+        .calc-btn.operator:hover {
+            background: linear-gradient(180deg, #FFA500, #FF8C00);
+            box-shadow: 0 6px 0 #CC5500;
+        }
+
+        .calc-btn.operator:active {
+            box-shadow: 0 2px 0 #CC5500;
+        }
+
+        .calc-btn.equals {
+            background: linear-gradient(180deg, var(--grass-green), #2E7D32);
+            border-color: #1B5E20;
+            box-shadow: 0 4px 0 #1B5E20;
+            grid-column: span 2;
+        }
+
+        .calc-btn.equals:hover {
+            background: linear-gradient(180deg, #66BB6A, var(--grass-green));
+            box-shadow: 0 6px 0 #1B5E20;
+        }
+
+        .calc-btn.equals:active {
+            box-shadow: 0 2px 0 #1B5E20;
+        }
+
+        .calc-btn.clear {
+            background: linear-gradient(180deg, var(--redstone-red), #B22222);
+            border-color: #8B0000;
+            box-shadow: 0 4px 0 #8B0000;
+        }
+
+        .calc-btn.clear:hover {
+            background: linear-gradient(180deg, #FF4444, var(--redstone-red));
+            box-shadow: 0 6px 0 #8B0000;
+        }
+
+        .calc-btn.clear:active {
+            box-shadow: 0 2px 0 #8B0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <h1>⛏️ ВИРТУАЛЬНЫЕ ВАЛЮТЫ ⚒️</h1>
+        
+        <div class="main-grid">
+            <div class="card">
+                <h2>💰 Калькулятор валют</h2>
+                
+                <div class="exchange-rates">
+                    <h3 style="color: var(--emerald-green); font-size: 1.2rem; margin-bottom: 15px;">Текущий курс:</h3>
+                    <div class="rate-item">
+                        <span>💎 5 Планукас</span>
+                        <span class="rate-value">= 1 Алмаз</span>
+                    </div>
+                    <div class="rate-item">
+                        <span>💚 25 Алмазов</span>
+                        <span class="rate-value">= 1 Изумруд</span>
+                    </div>
+                    <div class="rate-item">
+                        <span>☭ 1 Шаг</span>
+                        <span class="rate-value" id="stepRate">= 20 Планукас</span>
+                    </div>
+                    <div class="rate-item">
+                        <span>📊 Колебание курса</span>
+                        <span class="rate-value" id="fluctuation">±0%</span>
+                    </div>
+                </div>
+
+                <div class="currency-row">
+                    <div class="currency-icon">🪙</div>
+                    <label>Планукас:</label>
+                    <input type="number" id="planukas" value="0" step="0.01">
+                </div>
+
+                <div class="currency-row">
+                    <div class="currency-icon">💎</div>
+                    <label>Алмазы:</label>
+                    <input type="number" id="diamonds" value="0" step="0.01">
+                </div>
+
+                <div class="currency-row">
+                    <div class="currency-icon">💚</div>
+                    <label>Изумруды:</label>
+                    <input type="number" id="emeralds" value="0" step="0.01">
+                </div>
+
+                <div class="currency-row">
+                    <div class="currency-icon">☭</div>
+                    <label>Шаги:</label>
+                    <input type="number" id="steps" value="0" step="0.01">
+                </div>
+
+                <div class="info-box">
+                    <strong>ℹ️ Курс обновляется каждые 30 секунд</strong><br>
+                    Небольшие колебания курса шагов (±5%) делают экономику более реалистичной!
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔢 Калькулятор</h2>
+                
+                <div class="calculator">
+                    <div class="calc-display" id="calcDisplay">0</div>
+                    
+                    <div class="calc-buttons">
+                        <button class="calc-btn clear" onclick="calcClear()">C</button>
+                        <button class="calc-btn operator" onclick="calcBackspace()">←</button>
+                        <button class="calc-btn operator" onclick="calcOperation('%')">%</button>
+                        <button class="calc-btn operator" onclick="calcOperation('/')">÷</button>
+                        
+                        <button class="calc-btn" onclick="calcNumber('7')">7</button>
+                        <button class="calc-btn" onclick="calcNumber('8')">8</button>
+                        <button class="calc-btn" onclick="calcNumber('9')">9</button>
+                        <button class="calc-btn operator" onclick="calcOperation('*')">×</button>
+                        
+                        <button class="calc-btn" onclick="calcNumber('4')">4</button>
+                        <button class="calc-btn" onclick="calcNumber('5')">5</button>
+                        <button class="calc-btn" onclick="calcNumber('6')">6</button>
+                        <button class="calc-btn operator" onclick="calcOperation('-')">-</button>
+                        
+                        <button class="calc-btn" onclick="calcNumber('1')">1</button>
+                        <button class="calc-btn" onclick="calcNumber('2')">2</button>
+                        <button class="calc-btn" onclick="calcNumber('3')">3</button>
+                        <button class="calc-btn operator" onclick="calcOperation('+')">+</button>
+                        
+                        <button class="calc-btn" onclick="calcNumber('0')">0</button>
+                        <button class="calc-btn" onclick="calcNumber('.')">.</button>
+                        <button class="calc-btn equals" onclick="calcEquals()">=</button>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>📊 Математический калькулятор</strong><br>
+                    Поддерживает сложение, вычитание, умножение, деление и проценты!
+                </div>
+            </div>
+
+            <div class="card music-player">
+                <h2>🎵 Музыкальный плеер</h2>
+                
+                <div class="info-box" style="margin-bottom: 20px;">
+                    <strong>📁 Загрузить свою музыку:</strong><br>
+                    <input type="file" id="fileInput" accept="audio/*" multiple style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.5); color: #FFF; border: 3px solid var(--gold-yellow); width: 100%; font-family: 'VT323', monospace; font-size: 1.2rem; cursor: pointer;">
+                </div>
+                
+                <div class="playlist" id="playlist">
+                    <div class="track" data-url="https://www.bensound.com/bensound-music/bensound-creativeminds.mp3">
+                        <span class="track-icon">🎮</span>
+                        <span class="track-name">Creative Minds (Pixel)</span>
+                    </div>
+                    <div class="track" data-url="https://www.bensound.com/bensound-music/bensound-memories.mp3">
+                        <span class="track-icon">🌄</span>
+                        <span class="track-name">Memories (Ambient)</span>
+                    </div>
+                    <div class="track" data-url="https://www.bensound.com/bensound-music/bensound-slowmotion.mp3">
+                        <span class="track-icon">⛰️</span>
+                        <span class="track-name">Slow Motion (Chill)</span>
+                    </div>
+                    <div class="track" data-url="https://www.bensound.com/bensound-music/bensound-sunny.mp3">
+                        <span class="track-icon">☀️</span>
+                        <span class="track-name">Sunny (Upbeat)</span>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button id="playBtn">▶️ ИГРАТЬ</button>
+                    <button id="pauseBtn" disabled>⏸️ ПАУЗА</button>
+                    <button id="stopBtn" disabled>⏹️ СТОП</button>
+                </div>
+
+                <div class="volume-control">
+                    <span class="volume-label">🔊 Громкость:</span>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                    <span class="volume-value" id="volumeValue">70%</span>
+                </div>
+
+                <div class="status" id="status">
+                    ⏺️ Выберите трек из плейлиста
+                </div>
+
+                <div class="info-box">
+                    <strong>🎧 Совместное прослушивание:</strong><br>
+                    Все друзья на сайте будут слышать одну и ту же музыку при одновременном воспроизведении!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+
+    <script>
+        // Currency Calculator Logic
+        let baseStepRate = 20;
+        let currentFluctuation = 0;
+        
+        const planukasInput = document.getElementById('planukas');
+        const diamondsInput = document.getElementById('diamonds');
+        const emeraldsInput = document.getElementById('emeralds');
+        const stepsInput = document.getElementById('steps');
+        const stepRateDisplay = document.getElementById('stepRate');
+        const fluctuationDisplay = document.getElementById('fluctuation');
+
+        function getCurrentStepRate() {
+            return baseStepRate * (1 + currentFluctuation);
+        }
+
+        function updateFluctuation() {
+            // Random fluctuation between -5% and +5%
+            currentFluctuation = (Math.random() * 0.1) - 0.05;
+            const percentage = (currentFluctuation * 100).toFixed(2);
+            fluctuationDisplay.textContent = `${percentage > 0 ? '+' : ''}${percentage}%`;
+            
+            const currentRate = getCurrentStepRate();
+            stepRateDisplay.textContent = `= ${currentRate.toFixed(2)} Планукас`;
+            
+            // Recalculate if steps are entered
+            if (parseFloat(stepsInput.value) > 0) {
+                updateFromSteps();
+            }
+        }
+
+        function updateFromPlanukas() {
+            const planukas = parseFloat(planukasInput.value) || 0;
+            diamondsInput.value = (planukas / 5).toFixed(2);
+            emeraldsInput.value = (planukas / 125).toFixed(2);
+            stepsInput.value = (planukas / getCurrentStepRate()).toFixed(2);
+        }
+
+        function updateFromDiamonds() {
+            const diamonds = parseFloat(diamondsInput.value) || 0;
+            planukasInput.value = (diamonds * 5).toFixed(2);
+            emeraldsInput.value = (diamonds / 25).toFixed(2);
+            stepsInput.value = (diamonds * 5 / getCurrentStepRate()).toFixed(2);
+        }
+
+        function updateFromEmeralds() {
+            const emeralds = parseFloat(emeraldsInput.value) || 0;
+            planukasInput.value = (emeralds * 125).toFixed(2);
+            diamondsInput.value = (emeralds * 25).toFixed(2);
+            stepsInput.value = (emeralds * 125 / getCurrentStepRate()).toFixed(2);
+        }
+
+        function updateFromSteps() {
+            const steps = parseFloat(stepsInput.value) || 0;
+            const planukas = steps * getCurrentStepRate();
+            planukasInput.value = planukas.toFixed(2);
+            diamondsInput.value = (planukas / 5).toFixed(2);
+            emeraldsInput.value = (planukas / 125).toFixed(2);
+        }
+
+        planukasInput.addEventListener('input', updateFromPlanukas);
+        diamondsInput.addEventListener('input', updateFromDiamonds);
+        emeraldsInput.addEventListener('input', updateFromEmeralds);
+        stepsInput.addEventListener('input', updateFromSteps);
+
+        // Update fluctuation every 30 seconds
+        updateFluctuation();
+        setInterval(updateFluctuation, 30000);
+
+        // Calculator Logic
+        let calcCurrentValue = '0';
+        let calcPreviousValue = '';
+        let calcOperation = '';
+        let calcShouldResetDisplay = false;
+
+        const calcDisplay = document.getElementById('calcDisplay');
+
+        function updateCalcDisplay() {
+            calcDisplay.textContent = calcCurrentValue;
+        }
+
+        function calcNumber(num) {
+            if (calcShouldResetDisplay) {
+                calcCurrentValue = num;
+                calcShouldResetDisplay = false;
+            } else {
+                if (calcCurrentValue === '0' && num !== '.') {
+                    calcCurrentValue = num;
+                } else if (num === '.' && calcCurrentValue.includes('.')) {
+                    return;
+                } else {
+                    calcCurrentValue += num;
+                }
+            }
+            updateCalcDisplay();
+        }
+
+        function calcOperation(op) {
+            if (calcPreviousValue && calcOperation && !calcShouldResetDisplay) {
+                calcEquals();
+            }
+            calcPreviousValue = calcCurrentValue;
+            calcOperation = op;
+            calcShouldResetDisplay = true;
+        }
+
+        function calcEquals() {
+            if (!calcPreviousValue || !calcOperation) return;
+            
+            const prev = parseFloat(calcPreviousValue);
+            const current = parseFloat(calcCurrentValue);
+            let result;
+
+            switch (calcOperation) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    result = current !== 0 ? prev / current : 'Error';
+                    break;
+                case '%':
+                    result = prev % current;
+                    break;
+                default:
+                    return;
+            }
+
+            if (result === 'Error') {
+                calcCurrentValue = 'Error';
+            } else {
+                calcCurrentValue = result.toString();
+                if (calcCurrentValue.length > 12) {
+                    calcCurrentValue = parseFloat(calcCurrentValue).toExponential(6);
+                }
+            }
+            
+            calcOperation = '';
+            calcPreviousValue = '';
+            calcShouldResetDisplay = true;
+            updateCalcDisplay();
+        }
+
+        function calcClear() {
+            calcCurrentValue = '0';
+            calcPreviousValue = '';
+            calcOperation = '';
+            calcShouldResetDisplay = false;
+            updateCalcDisplay();
+        }
+
+        function calcBackspace() {
+            if (calcCurrentValue.length > 1) {
+                calcCurrentValue = calcCurrentValue.slice(0, -1);
+            } else {
+                calcCurrentValue = '0';
+            }
+            updateCalcDisplay();
+        }
+
+        // Keyboard support for calculator
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') calcNumber(e.key);
+            if (e.key === '.') calcNumber('.');
+            if (e.key === '+') calcOperation('+');
+            if (e.key === '-') calcOperation('-');
+            if (e.key === '*') calcOperation('*');
+            if (e.key === '/') { e.preventDefault(); calcOperation('/'); }
+            if (e.key === '%') calcOperation('%');
+            if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); calcEquals(); }
+            if (e.key === 'Escape') calcClear();
+            if (e.key === 'Backspace') { e.preventDefault(); calcBackspace(); }
+        });
+
+        // Music Player Logic
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
+        const statusDisplay = document.getElementById('status');
+        const playlistContainer = document.getElementById('playlist');
+        const fileInput = document.getElementById('fileInput');
+
+        let currentTrack = null;
+        let tracks = document.querySelectorAll('.track');
+
+        // Set initial volume
+        audioPlayer.volume = volumeSlider.value / 100;
+
+        // File upload handler
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            for (let file of files) {
+                if (file.type.startsWith('audio/')) {
+                    const url = URL.createObjectURL(file);
+                    addTrackToPlaylist(file.name, url, true);
+                }
+            }
+            fileInput.value = ''; // Reset input
+        });
+
+        function addTrackToPlaylist(name, url, isUserTrack = false) {
+            const track = document.createElement('div');
+            track.className = 'track' + (isUserTrack ? ' user-track' : '');
+            track.dataset.url = url;
+            track.innerHTML = `
+                <span class="track-icon">${isUserTrack ? '📁' : '🎵'}</span>
+                <span class="track-name">${name}</span>
+                ${isUserTrack ? '<button class="remove-track" onclick="removeTrack(this)">❌</button>' : ''}
+            `;
+            
+            track.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-track')) return;
+                selectTrack(track);
+            });
+            
+            playlistContainer.appendChild(track);
+            updateTracksList();
+        }
+
+        function selectTrack(track) {
+            document.querySelectorAll('.track').forEach(t => t.classList.remove('active'));
+            track.classList.add('active');
+            currentTrack = track.dataset.url;
+            audioPlayer.src = currentTrack;
+            statusDisplay.textContent = `🎵 Выбрано: ${track.querySelector('.track-name').textContent}`;
+            statusDisplay.classList.remove('playing');
+        }
+
+        function removeTrack(button) {
+            const track = button.closest('.track');
+            const wasActive = track.classList.contains('active');
+            track.remove();
+            
+            if (wasActive) {
+                stopBtn.click();
+                currentTrack = null;
+                statusDisplay.textContent = '⏺️ Выберите трек из плейлиста';
+            }
+            
+            updateTracksList();
+        }
+
+        function updateTracksList() {
+            tracks = document.querySelectorAll('.track');
+        }
+
+        // Make removeTrack global
+        window.removeTrack = removeTrack;
+
+        // Track selection for default tracks
+        updateTracksList();
+        tracks.forEach(track => {
+            track.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-track')) return;
+                selectTrack(track);
+            });
+        });
+
+        // Play button
+        playBtn.addEventListener('click', () => {
+            if (currentTrack) {
+                audioPlayer.play().then(() => {
+                    playBtn.disabled = true;
+                    pauseBtn.disabled = false;
+                    stopBtn.disabled = false;
+                    statusDisplay.textContent = '▶️ Воспроизведение...';
+                    statusDisplay.classList.add('playing');
+                }).catch(err => {
+                    console.error('Ошибка воспроизведения:', err);
+                    statusDisplay.textContent = '⚠️ Ошибка загрузки трека';
+                });
+            } else {
+                statusDisplay.textContent = '⚠️ Сначала выберите трек!';
+            }
+        });
+
+        // Pause button
+        pauseBtn.addEventListener('click', () => {
+            audioPlayer.pause();
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            statusDisplay.textContent = '⏸️ Пауза';
+            statusDisplay.classList.remove('playing');
+        });
+
+        // Stop button
+        stopBtn.addEventListener('click', () => {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = true;
+            statusDisplay.textContent = '⏹️ Остановлено';
+            statusDisplay.classList.remove('playing');
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value;
+            audioPlayer.volume = volume / 100;
+            volumeValue.textContent = `${volume}%`;
+        });
+
+        // Auto-play next track when current ends
+        audioPlayer.addEventListener('ended', () => {
+            const allTracks = document.querySelectorAll('.track');
+            const currentIndex = Array.from(allTracks).findIndex(t => t.classList.contains('active'));
+            const nextIndex = (currentIndex + 1) % allTracks.length;
+            selectTrack(allTracks[nextIndex]);
+            setTimeout(() => playBtn.click(), 100);
+        });
+
+        // Create particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.animationDuration = (3 + Math.random() * 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+    </script>
+</body>
+</html>
