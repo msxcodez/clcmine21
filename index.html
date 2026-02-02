@@ -191,12 +191,48 @@
         .rate-value {
             color: var(--gold-yellow);
             font-weight: bold;
-            animation: pulse 2s ease-in-out infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        /* Quick calculation buttons */
+        .quick-calc {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border: 3px solid var(--diamond-cyan);
+            margin-bottom: 20px;
+        }
+
+        .quick-calc h3 {
+            color: var(--diamond-cyan);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            padding: 12px;
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            background: linear-gradient(180deg, var(--diamond-cyan), #008B8B);
+            border: 3px solid #006666;
+            color: #FFF;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+        }
+
+        .calc-btn:hover {
+            background: linear-gradient(180deg, #00FFFF, var(--diamond-cyan));
+            transform: translateY(-2px);
+        }
+
+        .calc-btn:active {
+            transform: translateY(1px);
         }
 
         /* Music Player */
@@ -258,12 +294,6 @@
             font-size: 24px;
         }
 
-        .track-name {
-            flex: 1;
-            font-size: 1.3rem;
-            color: #FFF;
-        }
-
         .remove-track {
             padding: 5px 10px;
             font-family: 'VT323', monospace;
@@ -278,6 +308,12 @@
         .remove-track:hover {
             background: #FF0000;
             transform: scale(1.1);
+        }
+
+        .track-name {
+            flex: 1;
+            font-size: 1.3rem;
+            color: #FFF;
         }
 
         .controls {
@@ -402,6 +438,21 @@
             color: var(--gold-yellow);
         }
 
+        .sync-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            margin-left: 10px;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
         @media (max-width: 968px) {
             .main-grid {
                 grid-template-columns: 1fr;
@@ -413,6 +464,10 @@
 
             h2 {
                 font-size: 1rem;
+            }
+
+            .calc-buttons {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -442,46 +497,9 @@
             90% { opacity: 1; }
             100% { opacity: 0; transform: translateY(-100px) rotate(360deg); }
         }
-
-        .theme-switcher {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-
-        .theme-button {
-            padding: 12px 20px;
-            background: var(--redstone-red);
-            color: var(--gold-yellow);
-            border: 4px solid #8B0000;
-            font-family: 'Press Start 2P', cursive;
-            cursor: pointer;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            box-shadow: 0 4px 0 #8B0000;
-            transition: all 0.1s;
-        }
-
-        .theme-button:hover {
-            background: #FF0000;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #8B0000;
-        }
-
-        .theme-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #8B0000;
-        }
     </style>
 </head>
 <body>
-    <div class="theme-switcher">
-        <button class="theme-button" onclick="window.location.href='soviet-currency-calculator.html'">
-            ☭ Советский стиль
-        </button>
-    </div>
-
     <div class="particles" id="particles"></div>
     
     <div class="container">
@@ -502,12 +520,41 @@
                         <span class="rate-value">= 1 Изумруд</span>
                     </div>
                     <div class="rate-item">
-                        <span>☭ 1 Шаг</span>
-                        <span class="rate-value" id="stepRate">= 20 Планукас</span>
+                        <span>☭ 20 Шагов</span>
+                        <span class="rate-value">= 80 Планукас</span>
                     </div>
-                    <div class="rate-item">
-                        <span>📊 Колебание курса</span>
-                        <span class="rate-value" id="fluctuation">±0%</span>
+                </div>
+
+                <div class="quick-calc">
+                    <h3>⚡ Быстрый расчёт</h3>
+                    <div class="calc-buttons">
+                        <button class="calc-btn" onclick="quickCalc(100, 'planukas')">100 Планукас</button>
+                        <button class="calc-btn" onclick="quickCalc(500, 'planukas')">500 Планукас</button>
+                        <button class="calc-btn" onclick="quickCalc(10, 'diamonds')">10 Алмазов</button>
+                        <button class="calc-btn" onclick="quickCalc(50, 'diamonds')">50 Алмазов</button>
+                        <button class="calc-btn" onclick="quickCalc(1, 'emeralds')">1 Изумруд</button>
+                        <button class="calc-btn" onclick="quickCalc(5, 'emeralds')">5 Изумрудов</button>
+                        <button class="calc-btn" onclick="quickCalc(100, 'steps')">100 Шагов</button>
+                        <button class="calc-btn" onclick="clearAll()">🗑️ Очистить</button>
+                    </div>
+                </div>
+
+                <div class="quick-calc" style="margin-top: 20px;">
+                    <h3>🔢 Операции</h3>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;">
+                        <button class="calc-btn" onclick="mathOperation('add')">➕ Плюс</button>
+                        <button class="calc-btn" onclick="mathOperation('subtract')">➖ Минус</button>
+                        <button class="calc-btn" onclick="mathOperation('multiply')">✖️ Умножить</button>
+                        <button class="calc-btn" onclick="mathOperation('divide')">➗ Делить</button>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center; background: rgba(0,0,0,0.3); padding: 15px; border: 2px solid rgba(255,255,255,0.2);">
+                        <input type="number" id="mathValue" placeholder="Введите число" style="flex: 1; padding: 10px; font-family: 'VT323', monospace; font-size: 1.3rem; background: rgba(0,0,0,0.5); border: 2px solid var(--stone-gray); color: #FFF;">
+                        <select id="mathCurrency" style="padding: 10px; font-family: 'VT323', monospace; font-size: 1.3rem; background: rgba(0,0,0,0.5); border: 2px solid var(--stone-gray); color: #FFF;">
+                            <option value="planukas">Планукас</option>
+                            <option value="diamonds">Алмазы</option>
+                            <option value="emeralds">Изумруды</option>
+                            <option value="steps">Шаги</option>
+                        </select>
                     </div>
                 </div>
 
@@ -536,13 +583,13 @@
                 </div>
 
                 <div class="info-box">
-                    <strong>ℹ️ Курс обновляется каждые 30 секунд</strong><br>
-                    Небольшие колебания курса шагов (±5%) делают экономику более реалистичной!
+                    <strong>ℹ️ Курсы обмена:</strong><br>
+                    1 Алмаз = 5 Планукас | 1 Изумруд = 125 Планукас | 20 Шагов = 80 Планукас
                 </div>
             </div>
 
             <div class="card music-player">
-                <h2>🎵 Музыкальный плеер</h2>
+                <h2>🎵 Синхронный плеер <span class="sync-indicator"></span></h2>
                 
                 <div class="info-box" style="margin-bottom: 20px;">
                     <strong>📁 Загрузить свою музыку:</strong><br>
@@ -585,8 +632,8 @@
                 </div>
 
                 <div class="info-box">
-                    <strong>🎧 Совместное прослушивание:</strong><br>
-                    Все друзья на сайте будут слышать одну и ту же музыку при одновременном воспроизведении!
+                    <strong>🌐 Синхронное воспроизведение:</strong><br>
+                    Все пользователи на сайте слышат одну и ту же музыку одновременно! Управление доступно каждому.
                 </div>
             </div>
         </div>
@@ -596,62 +643,111 @@
 
     <script>
         // Currency Calculator Logic
-        let baseStepRate = 20;
-        let currentFluctuation = 0;
+        const STEP_RATE = 4; // 20 шагов = 80 планукас, т.е. 1 шаг = 4 планукаса
         
         const planukasInput = document.getElementById('planukas');
         const diamondsInput = document.getElementById('diamonds');
         const emeraldsInput = document.getElementById('emeralds');
         const stepsInput = document.getElementById('steps');
-        const stepRateDisplay = document.getElementById('stepRate');
-        const fluctuationDisplay = document.getElementById('fluctuation');
-
-        function getCurrentStepRate() {
-            return baseStepRate * (1 + currentFluctuation);
-        }
-
-        function updateFluctuation() {
-            // Random fluctuation between -5% and +5%
-            currentFluctuation = (Math.random() * 0.1) - 0.05;
-            const percentage = (currentFluctuation * 100).toFixed(2);
-            fluctuationDisplay.textContent = `${percentage > 0 ? '+' : ''}${percentage}%`;
-            
-            const currentRate = getCurrentStepRate();
-            stepRateDisplay.textContent = `= ${currentRate.toFixed(2)} Планукас`;
-            
-            // Recalculate if steps are entered
-            if (parseFloat(stepsInput.value) > 0) {
-                updateFromSteps();
-            }
-        }
 
         function updateFromPlanukas() {
             const planukas = parseFloat(planukasInput.value) || 0;
             diamondsInput.value = (planukas / 5).toFixed(2);
             emeraldsInput.value = (planukas / 125).toFixed(2);
-            stepsInput.value = (planukas / getCurrentStepRate()).toFixed(2);
+            stepsInput.value = (planukas / STEP_RATE).toFixed(2);
         }
 
         function updateFromDiamonds() {
             const diamonds = parseFloat(diamondsInput.value) || 0;
             planukasInput.value = (diamonds * 5).toFixed(2);
             emeraldsInput.value = (diamonds / 25).toFixed(2);
-            stepsInput.value = (diamonds * 5 / getCurrentStepRate()).toFixed(2);
+            stepsInput.value = (diamonds * 5 / STEP_RATE).toFixed(2);
         }
 
         function updateFromEmeralds() {
             const emeralds = parseFloat(emeraldsInput.value) || 0;
             planukasInput.value = (emeralds * 125).toFixed(2);
             diamondsInput.value = (emeralds * 25).toFixed(2);
-            stepsInput.value = (emeralds * 125 / getCurrentStepRate()).toFixed(2);
+            stepsInput.value = (emeralds * 125 / STEP_RATE).toFixed(2);
         }
 
         function updateFromSteps() {
             const steps = parseFloat(stepsInput.value) || 0;
-            const planukas = steps * getCurrentStepRate();
+            const planukas = steps * STEP_RATE;
             planukasInput.value = planukas.toFixed(2);
             diamondsInput.value = (planukas / 5).toFixed(2);
             emeraldsInput.value = (planukas / 125).toFixed(2);
+        }
+
+        function quickCalc(value, type) {
+            switch(type) {
+                case 'planukas':
+                    planukasInput.value = value;
+                    updateFromPlanukas();
+                    break;
+                case 'diamonds':
+                    diamondsInput.value = value;
+                    updateFromDiamonds();
+                    break;
+                case 'emeralds':
+                    emeraldsInput.value = value;
+                    updateFromEmeralds();
+                    break;
+                case 'steps':
+                    stepsInput.value = value;
+                    updateFromSteps();
+                    break;
+            }
+        }
+
+        function clearAll() {
+            planukasInput.value = '0';
+            diamondsInput.value = '0';
+            emeraldsInput.value = '0';
+            stepsInput.value = '0';
+        }
+
+        function mathOperation(operation) {
+            const value = parseFloat(document.getElementById('mathValue').value);
+            const currency = document.getElementById('mathCurrency').value;
+            
+            if (isNaN(value)) {
+                alert('⚠️ Введите число!');
+                return;
+            }
+
+            let inputElement;
+            switch(currency) {
+                case 'planukas': inputElement = planukasInput; break;
+                case 'diamonds': inputElement = diamondsInput; break;
+                case 'emeralds': inputElement = emeraldsInput; break;
+                case 'steps': inputElement = stepsInput; break;
+            }
+
+            let currentValue = parseFloat(inputElement.value) || 0;
+            let newValue;
+
+            switch(operation) {
+                case 'add':
+                    newValue = currentValue + value;
+                    break;
+                case 'subtract':
+                    newValue = currentValue - value;
+                    break;
+                case 'multiply':
+                    newValue = currentValue * value;
+                    break;
+                case 'divide':
+                    if (value === 0) {
+                        alert('⚠️ Нельзя делить на ноль!');
+                        return;
+                    }
+                    newValue = currentValue / value;
+                    break;
+            }
+
+            inputElement.value = newValue.toFixed(2);
+            inputElement.dispatchEvent(new Event('input'));
         }
 
         planukasInput.addEventListener('input', updateFromPlanukas);
@@ -659,11 +755,7 @@
         emeraldsInput.addEventListener('input', updateFromEmeralds);
         stepsInput.addEventListener('input', updateFromSteps);
 
-        // Update fluctuation every 30 seconds
-        updateFluctuation();
-        setInterval(updateFluctuation, 30000);
-
-        // Music Player Logic
+        // Synchronized Music Player Logic with localStorage
         const audioPlayer = document.getElementById('audioPlayer');
         const playBtn = document.getElementById('playBtn');
         const pauseBtn = document.getElementById('pauseBtn');
@@ -676,6 +768,7 @@
 
         let currentTrack = null;
         let tracks = document.querySelectorAll('.track');
+        let isUpdatingFromStorage = false;
 
         // Set initial volume
         audioPlayer.volume = volumeSlider.value / 100;
@@ -716,6 +809,11 @@
             track.classList.add('active');
             currentTrack = track.dataset.url;
             audioPlayer.src = currentTrack;
+            
+            syncState.currentTrackUrl = currentTrack;
+            syncState.currentTime = 0;
+            saveSyncState();
+            
             statusDisplay.textContent = `🎵 Выбрано: ${track.querySelector('.track-name').textContent}`;
             statusDisplay.classList.remove('playing');
         }
@@ -750,6 +848,88 @@
             });
         });
 
+        // Sync state object
+        const syncState = {
+            isPlaying: false,
+            isPaused: false,
+            currentTrackUrl: null,
+            currentTime: 0,
+            volume: 70,
+            lastUpdate: Date.now()
+        };
+
+        // Load sync state from localStorage
+        function loadSyncState() {
+            const saved = localStorage.getItem('musicPlayerSync');
+            if (saved) {
+                const state = JSON.parse(saved);
+                return state;
+            }
+            return syncState;
+        }
+
+        // Save sync state to localStorage
+        function saveSyncState() {
+            if (isUpdatingFromStorage) return;
+            syncState.lastUpdate = Date.now();
+            localStorage.setItem('musicPlayerSync', JSON.stringify(syncState));
+        }
+
+        // Apply state from storage
+        function applySyncState(state) {
+            isUpdatingFromStorage = true;
+            
+            if (state.currentTrackUrl && state.currentTrackUrl !== currentTrack) {
+                currentTrack = state.currentTrackUrl;
+                audioPlayer.src = currentTrack;
+                
+                // Find and highlight active track
+                tracks.forEach(track => {
+                    if (track.dataset.url === currentTrack) {
+                        track.classList.add('active');
+                    } else {
+                        track.classList.remove('active');
+                    }
+                });
+            }
+
+            if (state.isPlaying && !state.isPaused) {
+                audioPlayer.currentTime = state.currentTime;
+                audioPlayer.play().catch(err => console.log('Auto-play prevented'));
+                playBtn.disabled = true;
+                pauseBtn.disabled = false;
+                stopBtn.disabled = false;
+                statusDisplay.textContent = '▶️ Воспроизведение...';
+                statusDisplay.classList.add('playing');
+            } else if (state.isPaused) {
+                audioPlayer.currentTime = state.currentTime;
+                audioPlayer.pause();
+                playBtn.disabled = false;
+                pauseBtn.disabled = true;
+                stopBtn.disabled = false;
+                statusDisplay.textContent = '⏸️ Пауза';
+                statusDisplay.classList.remove('playing');
+            } else {
+                audioPlayer.pause();
+                audioPlayer.currentTime = 0;
+                playBtn.disabled = false;
+                pauseBtn.disabled = true;
+                stopBtn.disabled = true;
+                statusDisplay.textContent = '⏹️ Остановлено';
+                statusDisplay.classList.remove('playing');
+            }
+
+            if (state.volume !== undefined) {
+                volumeSlider.value = state.volume;
+                audioPlayer.volume = state.volume / 100;
+                volumeValue.textContent = `${state.volume}%`;
+            }
+
+            setTimeout(() => {
+                isUpdatingFromStorage = false;
+            }, 100);
+        }
+
         // Play button
         playBtn.addEventListener('click', () => {
             if (currentTrack) {
@@ -759,6 +939,11 @@
                     stopBtn.disabled = false;
                     statusDisplay.textContent = '▶️ Воспроизведение...';
                     statusDisplay.classList.add('playing');
+                    
+                    syncState.isPlaying = true;
+                    syncState.isPaused = false;
+                    syncState.currentTime = audioPlayer.currentTime;
+                    saveSyncState();
                 }).catch(err => {
                     console.error('Ошибка воспроизведения:', err);
                     statusDisplay.textContent = '⚠️ Ошибка загрузки трека';
@@ -775,6 +960,10 @@
             pauseBtn.disabled = true;
             statusDisplay.textContent = '⏸️ Пауза';
             statusDisplay.classList.remove('playing');
+            
+            syncState.isPaused = true;
+            syncState.currentTime = audioPlayer.currentTime;
+            saveSyncState();
         });
 
         // Stop button
@@ -786,6 +975,11 @@
             stopBtn.disabled = true;
             statusDisplay.textContent = '⏹️ Остановлено';
             statusDisplay.classList.remove('playing');
+            
+            syncState.isPlaying = false;
+            syncState.isPaused = false;
+            syncState.currentTime = 0;
+            saveSyncState();
         });
 
         // Volume control
@@ -793,16 +987,42 @@
             const volume = e.target.value;
             audioPlayer.volume = volume / 100;
             volumeValue.textContent = `${volume}%`;
+            
+            syncState.volume = parseInt(volume);
+            saveSyncState();
+        });
+
+        // Update current time periodically when playing
+        setInterval(() => {
+            if (!audioPlayer.paused && !isUpdatingFromStorage) {
+                syncState.currentTime = audioPlayer.currentTime;
+                saveSyncState();
+            }
+        }, 1000);
+
+        // Listen for storage changes from other tabs/users
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'musicPlayerSync' && e.newValue) {
+                const newState = JSON.parse(e.newValue);
+                // Only apply if the update is recent (within 2 seconds)
+                if (Date.now() - newState.lastUpdate < 2000) {
+                    applySyncState(newState);
+                }
+            }
         });
 
         // Auto-play next track when current ends
         audioPlayer.addEventListener('ended', () => {
-            const allTracks = document.querySelectorAll('.track');
-            const currentIndex = Array.from(allTracks).findIndex(t => t.classList.contains('active'));
+            const allTracks = Array.from(tracks);
+            const currentIndex = allTracks.findIndex(t => t.classList.contains('active'));
             const nextIndex = (currentIndex + 1) % allTracks.length;
-            selectTrack(allTracks[nextIndex]);
+            allTracks[nextIndex].click();
             setTimeout(() => playBtn.click(), 100);
         });
+
+        // Initialize from saved state
+        const savedState = loadSyncState();
+        applySyncState(savedState);
 
         // Create particles
         function createParticles() {
